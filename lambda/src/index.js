@@ -9,6 +9,7 @@ var dynamodb = null;
 var options = require('./options');
 var defaultMusicService = ((options.defaultMusicService !== undefined) && (options.defaultMusicService > '')) ? options.defaultMusicService : 'presets';
 var defaultRoom = (options.defaultRoom !== undefined) ? options.defaultRoom : '';
+var EchoId = 'DefaultEcho';
 
 
 var AlexaSkill = require('./AlexaSkill');
@@ -33,9 +34,16 @@ EchoSonos.prototype.constructor = EchoSonos;
 
 EchoSonos.prototype.onLaunch = function (launchRequest, session, response) {
     console.log("launchHandler invoked");
-    loadCurrentRoomAndService('DefaultEcho', defaultRoom, function(room, service) {
+    loadCurrentRoomAndService(EchoId, defaultRoom, function(room, service) {
     	response.ask(`The current room is the ${room} and the current music service is ${service}. What would you like Sonos to do?`,'What would you like Sonos to do?');
     });
+}
+
+EchoSonos.prototype.setEchoId = function (context) {
+    console.log("deviceId = " + context.System.device.deviceId);
+    if (context.System.device.deviceId !== undefined) {
+      EchoId = context.System.device.deviceId;
+    }
 }
 
 EchoSonos.prototype.interactiveMode = function () {
@@ -56,77 +64,77 @@ EchoSonos.prototype.intentHandlers = {
 
     AlbumIntent: function (intent, session, response) {
         console.log("AlbumIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             musicHandler(room, service, sonosProxy.ContentType.Album, intent.slots.AlbumName.value, response);
         });
     },
 
     ArtistIntent: function (intent, session, response) {
         console.log("ArtistIntent received for room " + intent.slots.Room.value);
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             musicHandler(room, service, sonosProxy.ContentType.Artist, intent.slots.ArtistName.value, response);
         });
     },
 
     TrackIntent: function (intent, session, response) {
         console.log("TrackIntent received for room " + intent.slots.Room.value);
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             musicHandler(room, service, sonosProxy.ContentType.Song, intent.slots.TrackName.value, response);
         });
     },
 
     MusicRadioIntent: function (intent, session, response) {
         console.log("MusicRadioIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             musicHandler(room, service, sonosProxy.ContentType.Station, intent.slots.ArtistName.value, response);
         });
     },
 
     PlayMoreByArtistIntent: function (intent, session, response) {
         console.log("PlayMoreByArtist received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             moreMusicHandler(room, service, '/song/', response);
         });
     },
 
     PlayMoreLikeTrackIntent: function (intent, session, response) {
         console.log("PlayMoreLikeTrackIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             moreMusicHandler(room, service, '/station/', response);
         });
     },
 
     SiriusXMStationIntent: function (intent, session, response) {
         console.log("SiriusXMStationIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             siriusXMHandler(room, intent.slots.Station.value, 'station', response);
         });
     },
 
     SiriusXMChannelIntent: function (intent, session, response) {
         console.log("SiriusXMChannelIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             siriusXMHandler(room, intent.slots.Channel.value, 'channel', response);
         });
     },
 
     PandoraMusicIntent: function (intent, session, response) {
         console.log("PandoraMusicIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             pandoraHandler(room, 'pandoraPlay', intent.slots.Name.value, response);
         });
     },
 
     PandoraThumbsUpIntent: function (intent, session, response) {
         console.log("PandoraThumbsUpIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             pandoraHandler(room, 'pandoraThumbsUp', '', response);
         });
     },
 
     PandoraThumbsDownIntent: function (intent, session, response) {
         console.log("PandoraThumbsDownIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             pandoraHandler(room, 'pandoraThumbsDown', '', response);
         });
     },
@@ -139,14 +147,14 @@ EchoSonos.prototype.intentHandlers = {
 
     PlaylistIntent: function (intent, session, response) {
         console.log("PlaylistIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             playlistHandler(room, intent.slots.Preset.value, 'playlist', response);
         });
     },
 
     FavoriteIntent: function (intent, session, response) {
         console.log("FavoriteIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             playlistHandler(room, intent.slots.Preset.value, 'favorite', response);
         });
     },
@@ -156,7 +164,7 @@ EchoSonos.prototype.intentHandlers = {
         if (!options.advancedMode) {
            response.tell("This command does not work unless advanced mode is turned on");
         } else {
-            changeCurrent('DefaultEcho', intent.slots.Room.value, '', function() {
+            changeCurrent(EchoId, intent.slots.Room.value, '', function() {
                 quickResponse(response, "OK");
             });
         }
@@ -167,7 +175,7 @@ EchoSonos.prototype.intentHandlers = {
         if (!options.advancedMode) {
             response.tell("This command does not work unless advanced mode is turned on");
         } else {
-            changeCurrent('DefaultEcho', '', intent.slots.Service.value, function() {
+            changeCurrent(EchoId, '', intent.slots.Service.value, function() {
                 quickResponse(response, "OK");
             });
         }
@@ -178,7 +186,7 @@ EchoSonos.prototype.intentHandlers = {
         if (!options.advancedMode) {
             response.tell("This command does not work unless advanced mode is turned on");
         } else {
-            changeCurrent('DefaultEcho', intent.slots.Room.value, intent.slots.Service.value, function() {
+            changeCurrent(EchoId, intent.slots.Room.value, intent.slots.Service.value, function() {
                 quickResponse(response, "OK");
             });
         }
@@ -192,7 +200,7 @@ EchoSonos.prototype.intentHandlers = {
 
     ResumeIntent: function (intent, session, response) {
         console.log("ResumeIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             var promise = sonosProxy.play(room);
             handleResponse(promise, response);
         });
@@ -206,7 +214,7 @@ EchoSonos.prototype.intentHandlers = {
 
     PauseIntent: function (intent, session, response) {
         console.log("PauseIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             var promise = sonosProxy.pause(room);
             handleResponse(promise, response);
         });
@@ -214,28 +222,28 @@ EchoSonos.prototype.intentHandlers = {
 
     VolumeDownIntent: function (intent, session, response) {
         console.log("VolumeDownIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             volumeHandler(room, response, '-10');
         });
     },
 
     VolumeUpIntent: function (intent, session, response) {
         console.log("VolumeUpIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             volumeHandler(room, response, '+10');
         });
     },
 
     SetVolumeIntent: function (intent, session, response) {
         console.log("SetVolumeIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             volumeHandler(room, response, intent.slots.Percent.value);
         });
     },
 
     NextTrackIntent: function (intent, session, response) {
         console.log("NextTrackIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             var promise = getCoordinatorForRoom(room).then((coordinator) => {
                 return sonosProxy.next(coordinator);
             });
@@ -246,7 +254,7 @@ EchoSonos.prototype.intentHandlers = {
 
     PreviousTrackIntent: function (intent, session, response) {
         console.log("PreviousTrackIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             var promise = getCoordinatorForRoom(room).then((coordinator) => {
                 return sonosProxy.previous(coordinator);
             });
@@ -257,12 +265,47 @@ EchoSonos.prototype.intentHandlers = {
 
     WhatsPlayingIntent: function (intent, session, response) {
         console.log("WhatsPlayingIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             sonosProxy.getState(room).then((data) => {
-                 var responseJson = JSON.parse(data);
-                 var randResponse = Math.floor(Math.random() * STATE_RESPONSES.length);
-                 var responseText = STATE_RESPONSES[randResponse].replace("$currentTitle", responseJson.currentTrack.title).replace("$currentArtist", responseJson.currentTrack.artist);
-                 quickResponse(response, responseText);
+                var responseJson = JSON.parse(data);
+                var randResponse = Math.floor(Math.random() * STATE_RESPONSES.length);
+                
+                var streamInfoArray;
+                var playTitle;
+                var playArtist;
+                // Check if something is playing
+                if (responseJson.playbackState == "PLAYING") {
+                    if (responseJson.currentTrack.uri.substring(0, 21) == "x-sonosapi-hls-static") {
+                        // Amazon Music Radio Station
+                        playTitle = responseJson.currentTrack.title;
+                        playArtist = responseJson.currentTrack.artist;
+                    } else if (responseJson.currentTrack.uri.substring(0, 14) == "x-sonosapi-hls") {
+                        // Sirius XM Radio Station
+                        streamInfoArray = responseJson.currentTrack.title.split("|");
+                        playTitle = streamInfoArray[2].substring(6);
+                        playArtist = streamInfoArray[3].substring(7);
+                    } else if (responseJson.currentTrack.uri.substring(0, 17) == "x-sonosapi-stream") {
+                        // Regular radio station
+                        streamInfoArray = responseJson.currentTrack.title.split(" - ");
+                        playTitle = streamInfoArray[1];
+                        playArtist = streamInfoArray[0];
+                    } else {
+                        // Regular song
+                        playTitle = responseJson.currentTrack.title;
+                        playArtist = responseJson.currentTrack.artist;
+                    }
+                    if ((playTitle)&&(playArtist)) {
+                        var audioTitle = playTitle.replace(/[@#$%\/]/g, " ").replace(/\(Remix\)/g, "").replace(/feat\./g, "featuring");
+                        var audioArtist = playArtist.replace(/[@#$%\/]/g, " ").replace(/feat\./g, "featuring");
+                        var responseText = STATE_RESPONSES[randResponse].replace("$currentTitle", audioTitle).replace("$currentArtist", audioArtist);
+                        quickResponse(response, responseText);
+                    } else {
+                        quickResponse(response, "Sorry, I cannot determine what's playing right now");
+                    }
+                } else {
+                        quickResponse(response, "There is nothing playing in this room");
+                }
+
             }).catch((error) => {
                 quickResponse(response, error.message);
             });
@@ -271,7 +314,7 @@ EchoSonos.prototype.intentHandlers = {
 
     MuteIntent: function (intent, session, response) {
         console.log("MuteIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             var promise = sonosProxy.mute(room);
             handleResponse(promise, response);
         });
@@ -279,7 +322,7 @@ EchoSonos.prototype.intentHandlers = {
 
     UnmuteIntent: function (intent, session, response) {
         console.log("UnmuteIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             var promise = sonosProxy.unmute(room);
             handleResponse(promise, response);
         });
@@ -287,7 +330,7 @@ EchoSonos.prototype.intentHandlers = {
 
     ClearQueueIntent: function (intent, session, response) {
         console.log("ClearQueueIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             var promise = getCoordinatorForRoom(room).then((coordinator) => {
                 return sonosProxy.clearqueue(coordinator);
             });
@@ -298,28 +341,28 @@ EchoSonos.prototype.intentHandlers = {
 
     RepeatIntent: function (intent, session, response) {
         console.log("RepeatIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             toggleHandler(room, intent.slots.Toggle.value, "repeat", response);
         });
     },
 
     ShuffleIntent: function (intent, session, response) {
         console.log("ShuffleIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             toggleHandler(room, intent.slots.Toggle.value, "shuffle", response);
         });
     },
 
     CrossfadeIntent: function (intent, session, response) {
         console.log("CrossfadeIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             toggleHandler(room, intent.slots.Toggle.value, "crossfade", response);
         });
     },
 
     UngroupIntent: function (intent, session, response) {
         console.log("UngroupIntent received");
-        loadCurrentRoomAndService('DefaultEcho', intent.slots.Room.value, function(room, service) {
+        loadCurrentRoomAndService(EchoId, intent.slots.Room.value, function(room, service) {
             var promise = sonosProxy.isolate(room);
             handleResponse(promise, response);
         });
