@@ -353,10 +353,49 @@ EchoSonos.prototype.intentHandlers = {
     }
 };
 
+// >>> KSH check for preset before search
+var myPresets = [
+    'ambient',
+    'baroque',
+    'blues',
+    'blues radio',
+    'blues uk',
+    'boot liquor',
+    'christmas',
+    'classical',
+    'classic blues',
+    'country',
+    'electronic',
+    'frogs',
+    'gangster',
+    'gangster rap',
+    'hearts of space',
+    'jazz',
+    'kera',
+    'lounge',
+    'middle eastern',
+    'ocean surf',
+    'ocean waves',
+    'quiet classical',
+    'rock',
+    'sahara sunset',
+    'secret agent',
+    'shit kicker',
+    'smooth jazz',
+    'this weeks show',
+    'thunder toads'
+];
+
+// >>> KSH check for preset before search
+function isPreset(p) {
+    console.log('isPreset(' + p + ')');
+    return myPresets.indexOf(p) != -1;
+}
+
 /** Handles Apple Music, Spotify, Deezer, library, or presets. The default can be specified in options.js or changed if advanced mode is turned on */
 function musicHandler(room, service, type, content, response) {
 
-    if (service == 'presets') {
+    if ((service == 'presets') || isPreset(content)) {
         var promise = sonosProxy.preset(content);
         handleResponse(promise, response);
         return;
