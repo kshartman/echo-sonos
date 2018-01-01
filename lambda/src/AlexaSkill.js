@@ -29,7 +29,6 @@ AlexaSkill.prototype.requestHandlers = {
     },
 
     SessionEndedRequest: function (event, context) {
-        this.normalMode();
         this.eventHandlers.onSessionEnded(event.request, event.session);
         context.succeed();
     }
@@ -51,8 +50,7 @@ AlexaSkill.prototype.eventHandlers = {
      * The subclass must override this function and provide feedback to the user.
      */
     onLaunch: function (launchRequest, session, response) {
-        this.interactiveMode();
-    	this.onLaunch(launchRequest, session, response);
+        throw "onLaunch should be overriden by subclass";
     },
 
     /**
@@ -97,8 +95,6 @@ AlexaSkill.prototype.execute = function (event, context) {
         if (!event.session.attributes) {
             event.session.attributes = {};
         }
-
-        this.setEchoId(event.context);
 
         if (event.session.new) {
             this.eventHandlers.onSessionStarted(event.request, event.session);
@@ -199,3 +195,4 @@ Response.prototype = (function () {
 })();
 
 module.exports = AlexaSkill;
+
