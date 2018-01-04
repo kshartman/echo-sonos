@@ -13,12 +13,13 @@ var defaultRoom = (options.defaultRoom !== undefined) ? options.defaultRoom : ''
 /* >>> KSH - BEGIN room aliases */
 function parseAliases(ra) {
     var obj;
+    console.log("PARSE ALIASES: " + ra);
     try {
-	obj = JSON.parse(ra);
+	    obj = JSON.parse(ra);
     } catch(err) {
-	obj = [];
+        console.error("PARSE ALIASES:", JSON.stringify(err, null, 2));
+	    obj = [];
     }
-    console.log("ROOM ALIASES: " + JSON.stringify(obj));
     return obj;
 }
 
@@ -29,15 +30,36 @@ function parseAliases(ra) {
            ]
 */
 
-// '[ { "room": "den", "alias": [ "greatroom", "great room", "living room", "upstairs", "downstairs" ] }, { "room": "bedroom", "alias": [ "master", "master bedroom" ] } ]'
+var roomAliases = [];
 
-var roomAliases = (options.roomAliases !== undefined) ? parseAliases(options.roomAliases) : [];
+try {
+    if  (options.useHome && options.homes.length) {
+        for (var i = 0; i < options.homes.length; i++) {
+            if (options.homes[i].name == options.useHome) {
+                roomAliases = options.homes[i].rooms;
+                if (options.debug) {
+                    console.log("SET ALIASES: " + JSON.stringify(roomAliases));
+                }
+                break;
+            }
+        }
+    }
+}
+catch (err) {
+    ;
+}
 
-function findAlias(room, aliases) {
+if (roomAliases.length == 0 && options.roomAliases !== undefined) {
+    roomAliases = parseAliases(options.roomAliases);
+    if (options.debug) {
+        console.log("SET ALIASES: " + JSON.stringify(roomAliases));
+    }
+}
+
+function findAlias(room) {
 	var res = room.toLowerCase();
-	if (!aliases) {
-		aliases = roomAliases;
-	}
+	var aliases = roomAliases;
+
 	try {
 		for (var i = 0; i < aliases.length; i++) {
 			for (var j = 0; j < aliases[i].alias.length; j++) {
@@ -50,7 +72,9 @@ function findAlias(room, aliases) {
 	} catch (err) {
 		;
 	}
-	console.log("FIND ALIAS: " + room + " -> " + res);
+    if (options.debug) {
+	    console.log("FIND ALIAS: " + room + " -> " + res);
+    }
 	return res;
 }
 
@@ -439,43 +463,19 @@ EchoSonos.prototype.intentHandlers = {
 };
 
 // >>> KSH check for preset before search
-var myPresets = [
-				 'ambient',
-				 'baroque',
-				 'blues',
-				 'blues radio',
-				 'blues uk',
-				 'boot liquor',
-				 'country',
-				 'christmas',
-				 'classical',
-				 'classic blues',
-				 'crickets',
-				 'electronic',
-				 'gangster',
-				 'gangster rap',
-				 'hearts of space',
-				 'jazz',
-				 'kera',
-				 'lounge',
-				 'middle eastern',
-				 'ocean surf',
-				 'ocean waves',
-				 'quiet classical',
-				 'rock',
-				 'sahara sunset',
-				 'secret agent',
-				 'shit kicker',
-				 'smooth jazz',
-				 'this weeks show',
-				 'thunder toads'
-				];
-
-
-// >>> KSH check for preset before search
 function isPreset(p) {
-	console.log('isPreset(' + p + ')');
-	return myPresets.indexOf(p) != -1;
+    if (options.debug) {
+	    console.log('isPreset(' + p + ')');
+    }
+    try {
+        return options.presets.indexOf(p.toLowerCase()) != -1;
+    }
+    catch (err) {
+        if (options.debug) {
+	        console.log('PRESET ERROR: ' + JSON.stringify(err, null, 2));
+        }
+        return false;
+    }
 }
 
 /** Handles Apple Music, Spotify, Deezer, library, or presets. The default can be specified in options.js or changed if advanced mode is turned on */

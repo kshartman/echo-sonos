@@ -26,7 +26,11 @@ var options = {
   defaultRoom: getDefault('DEFAULT_ROOM', ''),				        // Allows you to specify a default room when one is not specified in the utterance
   defaultMusicService: getDefault('DEFAULT_MUSIC_SERVICE', 'presets'), // Supports presets, apple, spotify, deezer, or library
   advancedMode: getDefault('ADVANCED_MODE', false),             // Allows you to specify and change default rooms and music services. Requires additional AWS setup
-    roomAliases: getDefault("ROOM_ALIASES", ''),  //>>> KSH 
+  roomAliases: getDefault('ROOM_ALIASES', ''), //>>> KSH array of room { room: <room-name>, alias: [ <string-alias1>, ... ] }
+  useHome: getDefault('USE_HOME', ''),         //>>> KSH string which home to use from homes
+  homes: [],                                   //>>> KSH array of { name: <name>, rooms: [ <room-aliases> ] }
+  presets: [],                                 //>>> KSH array of string preset names
+  debug: getDefault('DEBUG_CODE', false),      //>>> KSH
   useSQS: getDefault('USE_SQS', false),   // Use AWS SQS and node-sqs-proxy for secure communications
   defaultLinein: getDefault('DEFAULT_LINEIN', false)              // Allows you to specify a default Linein (e.g. with a dot connected) 
 };
