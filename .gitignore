@@ -2,3 +2,6 @@
 options.js
 settings.json
 *.zip
+zip/
+*~
+*#
