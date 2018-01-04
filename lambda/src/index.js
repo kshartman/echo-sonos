@@ -34,14 +34,14 @@ function parseAliases(ra) {
 var roomAliases = (options.roomAliases !== undefined) ? parseAliases(options.roomAliases) : [];
 
 function findAlias(room, aliases) {
-	var res = room;
+	var res = room.toLowerCase();
 	if (!aliases) {
 		aliases = roomAliases;
 	}
 	try {
 		for (var i = 0; i < aliases.length; i++) {
 			for (var j = 0; j < aliases[i].alias.length; j++) {
-				if (aliases[i].alias[j] == room) {
+				if (aliases[i].alias[j] == res) {
 					res = aliases[i].room;
 					throw res;
 				}
