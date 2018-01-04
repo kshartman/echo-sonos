@@ -75,7 +75,7 @@ var STATE_RESPONSES = [
 
 function checkRoomSlot(intent) {
 	try {
-		return intent.slots.Room.value;
+		return findAlias(intent.slots.Room.value);
 	}
 	catch(err) {
 		return '';
