@@ -427,8 +427,8 @@ EchoSonos.prototype.intentHandlers = {
 
     JoinGroupIntent: function (intent, session, response) {
         console.log("JoinGroupIntent received");
-        options.path = '/' + encodeURIComponent(intent.slots.JoiningRoom.value) + '/join/' +
-            encodeURIComponent(intent.slots.PlayingRoom.value);
+        options.path = '/' + encodeURIComponent(findAlias(intent.slots.JoiningRoom.value)) + '/join/' +
+            encodeURIComponent(findAlias(intent.slots.PlayingRoom.value));
         httpreq(options, function(error) {
             genericResponse(error, response);
         });
@@ -449,13 +449,13 @@ EchoSonos.prototype.intentHandlers = {
     },
 
     LineInIntent: function (intent, session, response) {
-	var room = checkRoomSlot(intent);
+	    var room = intent.slots.Room;
         var lineIn = intent.slots.LineIn || room;
 
-	console.log("LineInIntent received for room " + room);
+	    console.log("LineInIntent received");
 
-        options.path = '/' + encodeURIComponent(room.value) + '/linein/' +
-            encodeURIComponent(lineIn.value);
+        options.path = '/' + encodeURIComponent(findAlias(room.value)) + '/linein/' +
+            encodeURIComponent(findAlias(lineIn.value));
         httpreq(options, function(error) {
             genericResponse(error, response);
         });
