@@ -33,12 +33,12 @@ function parseJSONArray(js, name) {
 
 // '[ { "room": "den", "alias": [ "greatroom", "great room", "living room", "upstairs", "downstairs" ] }, { "room": "bedroom", "alias": [ "master", "master bedroom" ] } ]'
 
-var roomAliases = (options.roomAliases !== undefined) ? parseJSONArray(options.roomAliases, "ROOMS") : [];
+var myRoomAliases = (options.roomAliases !== undefined) ? parseJSONArray(options.roomAliases, "ROOMS") : [];
 
 function findAlias(room, aliases) {
 	var res = room;
 	if (!aliases) {
-		aliases = roomAliases;
+		aliases = myRoomAliases;
 	}
 	try {
 		for (var i = 0; i < aliases.length; i++) {
@@ -456,9 +456,19 @@ EchoSonos.prototype.intentHandlers = {
 };
 
 // >>> KSH check for preset before search
-var myPresets = (options.presets !== undefined) ? parseJSONArray(options.presets, "PRESETS") : ["ambient", "electronic", "rock", "blues", "kera", "ocean waves", "ocean surf"];
+var defaultPresets = {
+    "lakehouse": [
+        "africa","african night","ambient","ambient music","ambient radio","ancient beat","ancient beats","archaic beat","archaic beats","baroque","baroque music.","blues","blues radio","blues uk","boot liquor","chicago blues","christmas","christmas music","christmas radio","classical 101","classical","classical music","classical radio","classic blues","classic rock","country","crickets","electronic","electronic music","frogs","hearts of space","hos","jazz","kera","lounge","middle eastern","npr","ocean surf","ocean waves","public radio","quiet classical","quiet mus","rain","rainstorm","rock","roots reggae","sahara sunset","secret agent","shit kicker","smooth jazz","summer crickets","this weeks show","thunder frogs","thunder","thunderstorm","thunder storm","thundertoads","thunder toads","thunder tongues","wrr"
+    ],
+    "default": [
+        "africa","african night","ambient","ambient music","ambient radio","ancient beat","ancient beats","archaic beat","archaic beats","baroque","baroque music.","blues","blues radio","blues uk","boot liquor","chicago blues","christmas","christmas music","christmas radio","classical 101","classical","classical music","classical radio","classic blues","classic rock","country","crickets","electronic","electronic music","frogs","hearts of space","hos","jazz","kera","lounge","middle eastern","npr","ocean surf","ocean waves","public radio","quiet classical","quiet mus","rain","rainstorm","rock","roots reggae","sahara sunset","secret agent","shit kicker","smooth jazz","summer crickets","this weeks show","thunder frogs","thunder","thunderstorm","thunder storm","thundertoads","thunder toads","thunder tongues","wrr"
+    ]
+};
 
-// >>> KSH check for preset before search
+var myPresets = (options.presets !== undefined) ? parseJSONArray(options.presets, "PRESETS") : ((options.home && defaultPresets[options.home]) ? defaultPresets[options.home] : defaultPresets["default"]);
+
+console.log(myPresets);
+
 function isPreset(p) {
 	console.log('isPreset(' + p + ')');
 	return myPresets.indexOf(p) != -1;
@@ -469,12 +479,19 @@ function musicHandler(roomValue, service, cmdpath, name, response) {
 
 	// >>> KSH check for preset before search
 	var p = name.replace('artist:', '');
-	if (service == 'presets' || isPreset(p)) {
-		options.path = '/preset/' + encodeURIComponent(p);
-		httpreq(options, function(error) {
-			genericResponse(error, response);
-		});
-	} else if (name.replace('artist:', '') === 'undefined') {
+	if (service == 'presets') {
+		if (isPreset(p)) {
+            options.path = '/preset/' + encodeURIComponent(p);
+        
+		    httpreq(options, function(error) {
+			    genericResponse(error, response);
+            
+		    });
+        }
+        else {
+		    response.tell('I am too stupid to understand that');
+        }
+	} else if (p === 'undefined') {
 		response.tell('I am too stupid to understand that');
     }
     else {
@@ -712,78 +729,79 @@ function loadCurrentRoomAndService(echoId, room, OnCompleteFun) {
 			room = defaultRoom;
 		}
 	}
+
+	// >>> KSH move functions to root of container
+	function addCurrent(OnCompleteFun) {
+		console.log("Open DynamoDB for write");
+		checkDefaults();
+		var docClient = new AWS.DynamoDB.DocumentClient();
+		var params = {
+			TableName: "echo-sonos",
+			Item:{
+				"echoid": echoId,
+				"currentRoom": room,
+				"currentMusicService": service
+			}
+		};
+		console.log("Adding current settings record");
+		docClient.put(params, function(err, data) {
+			console.log("err=" + JSON.stringify(err, null, 2));
+			console.log("data=" + JSON.stringify(data, null, 2));
+			if (err) {
+				console.error("Unable to add default. Error JSON:", JSON.stringify(err, null, 2));
+			} else {
+				OnCompleteFun(room, service);
+			}
+		});
+	}
+
+	function readCurrent(OnCompleteFun) {
+		console.log("Open DynamoDB for read");
+		var newRoom = '';
+		var newService = '';
+		var docClient = new AWS.DynamoDB.DocumentClient();
+		var params = {
+			TableName: "echo-sonos",
+			Key: {
+				"echoid": echoId
+			}
+		};
+
+		console.log("Reading current settings");
+		docClient.get(params, function(err, data) {
+			//console.log("err=" + JSON.stringify(err, null, 2));
+			//console.log("data=" + JSON.stringify(data, null, 2));
+			if (err || (data.Item === undefined)) {
+				addCurrent(OnCompleteFun);
+			} else {
+				if (isBlank(room)) {
+					room = data.Item.currentRoom;
+				} else if (room != data.Item.currentRoom) {
+					newRoom = room;
+				}
+				if (isBlank(service)) {
+					service = data.Item.currentMusicService;
+				} else if (service != data.Item.currentMusicService) {
+					newService = service;
+				}
+				console.log("room=" + room +" newRoom=" + newRoom + "  service=" + service + " newService=" + newService);
+				if (isBlank(newRoom) && isBlank(newService)) {
+					OnCompleteFun(room, service);
+				} else {
+					changeCurrent(echoId, newRoom, newService, function() {
+						OnCompleteFun(room, service);
+					});
+				}
+			}
+		});
+	}
+
 	room = findAlias(room);  // >>> KSH 
 	if (isBlank(service) || (service == 'service')) {
 		service = defaultMusicService;
 	}
 	console.log("Advanced Mode = " + options.advancedMode);
 	if (options.advancedMode) {
-
-		function addCurrent(OnCompleteFun) {
-			console.log("Open DynamoDB for write");
-			checkDefaults();
-			var docClient = new AWS.DynamoDB.DocumentClient();
-			var params = {
-				TableName: "echo-sonos",
-				Item:{
-					"echoid": echoId,
-					"currentRoom": room,
-					"currentMusicService": service
-				}
-			};
-			console.log("Adding current settings record");
-			docClient.put(params, function(err, data) {
-				console.log("err=" + JSON.stringify(err, null, 2));
-				console.log("data=" + JSON.stringify(data, null, 2));
-				if (err) {
-					console.error("Unable to add default. Error JSON:", JSON.stringify(err, null, 2));
-				} else {
-					OnCompleteFun(room, service);
-				}
-			});
-		}
-
-		function readCurrent(OnCompleteFun) {
-			console.log("Open DynamoDB for read");
-			var newRoom = '';
-			var newService = '';
-			var docClient = new AWS.DynamoDB.DocumentClient();
-			var params = {
-				TableName: "echo-sonos",
-				Key: {
-					"echoid": echoId
-				}
-			};
-
-			console.log("Reading current settings");
-			docClient.get(params, function(err, data) {
-				//console.log("err=" + JSON.stringify(err, null, 2));
-				//console.log("data=" + JSON.stringify(data, null, 2));
-				if (err || (data.Item === undefined)) {
-					addCurrent(OnCompleteFun);
-				} else {
-					if (isBlank(room)) {
-						room = data.Item.currentRoom;
-					} else if (room != data.Item.currentRoom) {
-						newRoom = room;
-					}
-					if (isBlank(service)) {
-						service = data.Item.currentMusicService;
-					} else if (service != data.Item.currentMusicService) {
-						newService = service;
-					}
-					console.log("room=" + room +" newRoom=" + newRoom + "  service=" + service + " newService=" + newService);
-					if (isBlank(newRoom) && isBlank(newService)) {
-						OnCompleteFun(room, service);
-					} else {
-						changeCurrent(echoId, newRoom, newService, function() {
-							OnCompleteFun(room, service);
-						});
-					}
-				}
-			});
-		}
-
 		AWS.config.update({
 			region: process.env.AWS_REGION,
 			endpoint: "https://dynamodb." + process.env.AWS_REGION + ".amazonaws.com"
