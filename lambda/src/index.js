@@ -33,7 +33,69 @@ function parseJSONArray(js, name) {
 
 // '[ { "room": "den", "alias": [ "greatroom", "great room", "living room", "upstairs", "downstairs" ] }, { "room": "bedroom", "alias": [ "master", "master bedroom" ] } ]'
 
-var myRoomAliases = (options.roomAliases !== undefined) ? parseJSONArray(options.roomAliases, "ROOMS") : [];
+var myRoomAliases = [];
+var myPresets = [];
+
+function setRoomAliases() {
+    var home;
+    
+    if (!options.useHome
+        || !options.homes
+        || (typeof options.homes) !== 'object'
+        || (typeof options.homes[0]) !== 'object'        
+        || (typeof options.home) !== 'string'        
+        || !options.home
+        || !(home = options.homes.find(function(home) { return (((typeof home) === 'object') && (home.name === options.home)); })))
+    {
+        console.log('Using env.ROOM_ALIASES');
+        try {
+            myRoomAliases = parseJSONArray(options.roomAliases, "ROOMS");
+        }
+        catch (err) {
+            myRoomAliases = [];
+            console.log('ERR', err);
+        }
+    }
+    else {
+        console.log('Using hardcoded ROOM_ALIASES');
+        myRoomAliases = (home.rooms || []);
+    }
+    if (options.debug) {
+        console.log(myRoomAliases);
+    }
+}
+
+function setPresets() {
+    var home;
+    
+    if (!options.useHome
+        || !options.homes
+        || (typeof options.homes) !== 'object'
+        || (typeof options.homes[0]) !== 'object'        
+        || (typeof options.home) !== 'string'        
+        || !options.home
+        || !(home = options.homes.find(function(home) { return (((typeof home) === 'object') && (home.name === options.home)); })))
+    {
+        console.log('Using env.PRESETS');
+        try {
+            myPresets = parseJSONArray(options.presets, "PRESETS");
+        }
+        catch (err) {
+            myPresets = [];
+            console.log('ERR', err);
+        }
+    }
+    else {
+        console.log('Using hardcoded PRESETS');
+        myRoomAliases = (home.presets || []);
+    }
+    if (options.debug) {
+        console.log(myPresets);
+    }
+}
+
+setRoomAliases();
+setPresets();
 
 function findAlias(room, aliases) {
 	var res = room;
@@ -50,9 +112,11 @@ function findAlias(room, aliases) {
 			}
 		}
 	} catch (err) {
-		;
+        console.log('ERR', err);
 	}
-	console.log("FIND ALIAS: " + room + " -> " + res);
+	if (options.debug) {
+        console.log("FIND ALIAS: " + room + " -> " + res);
+    }
 	return res;
 }
 
@@ -455,22 +519,8 @@ EchoSonos.prototype.intentHandlers = {
     }
 };
 
-// >>> KSH check for preset before search
-var defaultPresets = {
-    "lakehouse": [
-        "africa","african night","ambient","ambient music","ambient radio","ancient beat","ancient beats","archaic beat","archaic beats","baroque","baroque music.","blues","blues radio","blues uk","boot liquor","chicago blues","christmas","christmas music","christmas radio","classical 101","classical","classical music","classical radio","classic blues","classic rock","country","crickets","electronic","electronic music","frogs","hearts of space","hos","jazz","kera","lounge","middle eastern","npr","ocean surf","ocean waves","public radio","quiet classical","quiet mus","rain","rainstorm","rock","roots reggae","sahara sunset","secret agent","shit kicker","smooth jazz","summer crickets","this weeks show","thunder frogs","thunder","thunderstorm","thunder storm","thundertoads","thunder toads","thunder tongues","wrr"
-    ],
-    "default": [
-        "africa","african night","ambient","ambient music","ambient radio","ancient beat","ancient beats","archaic beat","archaic beats","baroque","baroque music.","blues","blues radio","blues uk","boot liquor","chicago blues","christmas","christmas music","christmas radio","classical 101","classical","classical music","classical radio","classic blues","classic rock","country","crickets","electronic","electronic music","frogs","hearts of space","hos","jazz","kera","lounge","middle eastern","npr","ocean surf","ocean waves","public radio","quiet classical","quiet mus","rain","rainstorm","rock","roots reggae","sahara sunset","secret agent","shit kicker","smooth jazz","summer crickets","this weeks show","thunder frogs","thunder","thunderstorm","thunder storm","thundertoads","thunder toads","thunder tongues","wrr"
-    ]
-};
-
-var myPresets = (options.presets !== undefined) ? parseJSONArray(options.presets, "PRESETS") : ((options.home && defaultPresets[options.home]) ? defaultPresets[options.home] : defaultPresets["default"]);
-
-console.log(myPresets);
-
 function isPreset(p) {
-	console.log('isPreset(' + p + ')');
+	if (options.debug) console.log('isPreset(' + p + ')');
 	return myPresets.indexOf(p) != -1;
 }
 
@@ -479,7 +529,7 @@ function musicHandler(roomValue, service, cmdpath, name, response) {
 
 	// >>> KSH check for preset before search
 	var p = name.replace('artist:', '');
-	if (service == 'presets') {
+	if (isPreset(p) || (service == 'presets')) {
 		if (isPreset(p)) {
             options.path = '/preset/' + encodeURIComponent(p);
         
@@ -508,30 +558,6 @@ function musicHandler(roomValue, service, cmdpath, name, response) {
 		});
 	}
 }
-
-/** Handles Apple Music, Spotify, Deezer, library, or presets. The default can be specified in options.js or changed if advanced mode is turned on 
-    function musicHandler(roomValue, service, cmdpath, name, response) {
-
-    if (service == 'presets') {
-    options.path = '/preset/' + encodeURIComponent(name);
-    httpreq(options, function(error) {
-    genericResponse(error, response);
-    });
-    } else {
-    var skillPath = '/musicsearch/' + service.toLowerCase() + cmdpath + encodeURIComponent(name);
-    var msgStart = (cmdpath.startsWith('/station'))?'Started ':'Queued and started ';
-    var msgEnd = (cmdpath.startsWith('/station'))?' radio':'';
-
-    actOnCoordinator(options, skillPath, roomValue, function(error, responseBodyJson) {
-    if (error) {
-    response.tell(error.message);
-    } else {
-    response.tell(msgStart + name + msgEnd);
-    }
-    });
-    }
-    }
-**/
 
 /** Handles Apple Music - plays artist tracks or plays a radio station for the current track */
 function moreMusicHandler(roomValue, service, cmdpath, response) {
@@ -864,40 +890,38 @@ function httpreq(options, responseCallback) {
             sqsClient.sendMessage({
                 MessageBody: options.path,
                 QueueUrl: clientUrl
-            },
-                                  function(err, data) {
-                                      if (err) {
-                                          console.log('ERR', err);
-                                      } else {
-                                          console.log(data);
-                                          sqsServer.receiveMessage({
-                                              QueueUrl: serverUrl,
-                                              MaxNumberOfMessages: 1, // how many messages do we wanna retrieve?
-                                              VisibilityTimeout: 60,  // seconds - how long we want a lock on this job
-                                              WaitTimeSeconds: 20     // seconds - how long should we wait for a message?
-                                          },
-                                                                   function(err, data) {
-                                                                       var message = data.Messages[0];
-                                                                       var response = message.Body;
-                                                                       if (!err) {
-                                                                           sqsServer.deleteMessage({
-                                                                               QueueUrl: serverUrl,
-                                                                               ReceiptHandle: message.ReceiptHandle
-                                                                           }, function(err, data) {
-                                                                               responseCallback(undefined, response);
-                                                                               if (err) {
-                                                                                   console.log(err);
-                                                                               }
-                                                                           });
-                                                                       } else {
-                                                                           console.log(err);
-                                                                           responseCallback(err);
-                                                                       }
-                                                                   }
-                                                                  );
-                                      }
-                                  }
-                                 );
+            }, function(err, data) {
+                if (err) {
+                    console.log('ERR', err);
+                    responseCallback(err);
+                } else {
+                    console.log(data);
+                    sqsServer.receiveMessage({
+                        QueueUrl: serverUrl,
+                        MaxNumberOfMessages: 1, // how many messages do we wanna retrieve?
+                        VisibilityTimeout: 60,  // seconds - how long we want a lock on this job
+                        WaitTimeSeconds: 20     // seconds - how long should we wait for a message?
+                    }, function(err, data) {
+                        var message = data.Messages[0];
+                        var response = message.Body;
+                        if (!err) {
+                            sqsServer.deleteMessage({
+                                QueueUrl: serverUrl,
+                                ReceiptHandle: message.ReceiptHandle
+                            }, function(err, data) {
+                                responseCallback(undefined, response);
+                                if (err) {
+                                    console.log('ERR', err);
+                                }
+                            });
+                        } else {
+                            console.log('ERR', err);
+                            responseCallback(err);
+                        }
+                    });
+                }
+
+            });
         });
     } else {
         var transport = options.useHttps ? https : http;
