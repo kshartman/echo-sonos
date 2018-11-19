@@ -164,10 +164,21 @@ options.homes = myHomes;
 module.exports = options;
 
 function getDefault(key, defaultVal) {
-  if (typeof(process.env[key]) == 'undefined') { 
-    return defaultVal;
-  }
-  else {
+    if (typeof(process.env[key]) === 'undefined') { 
+        return defaultVal;
+    }
+    else if (typeof(process.env[key]) === 'string') {
+        var result = process.env[key].trim().toLowerCase();
+
+        if (result === 'false') {
+            return false;
+        }
+        else if (result === 'true') {
+            return true;
+        }
+        else if (result === '' || result === 'undefined') {
+            return defaultVal;
+        }
+    }
     return process.env[key];
-  }
 }

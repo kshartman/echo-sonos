@@ -1004,6 +1004,7 @@ function findCoordinatorForRoom(responseJson, room) {
 
 // Create the handler that responds to the Alexa Request.
 exports.handler = function (event, context) {
+    // console.log(options);
     // Create an instance of the EchoSonos skill.
     var echoSonos = new EchoSonos();
     if (options.useSQS) {
