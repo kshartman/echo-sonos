@@ -16,6 +16,7 @@ function parseJSONArray(js, name) {
     try {
 	    obj = JSON.parse(js);
     } catch(err) {
+        console.log("JSON PARSE ERROR", err);
 	    obj = [];
     }
     if (name) {
@@ -39,14 +40,18 @@ var myPresets = [];
 function setRoomAliases() {
     var home;
     
-    if (!options.useHome
-        || !options.homes
-        || (typeof options.homes) !== 'object'
-        || (typeof options.homes[0]) !== 'object'        
-        || (typeof options.home) !== 'string'        
-        || !options.home
-        || !(home = options.homes.find(function(home) { return (((typeof home) === 'object') && (home.name === options.home)); })))
+    if (options.useHomeRooms
+        && options.homes
+        && (typeof options.homes) === 'object'
+        && (typeof options.homes[0]) === 'object'        
+        && options.home
+        && (typeof options.home) === 'string'        
+        && (home = options.homes.find(function(home) { return (((typeof home) === 'object') && (home.name === options.home)); })))
     {
+        console.log('Using hardcoded ROOM_ALIASES');
+        myRoomAliases = (home.rooms || []);
+    }
+    else {
         console.log('Using env.ROOM_ALIASES');
         try {
             myRoomAliases = parseJSONArray(options.roomAliases, "ROOMS");
@@ -56,26 +61,27 @@ function setRoomAliases() {
             console.log('ERR', err);
         }
     }
-    else {
-        console.log('Using hardcoded ROOM_ALIASES');
-        myRoomAliases = (home.rooms || []);
-    }
     if (options.debug) {
         console.log(myRoomAliases);
     }
 }
 
+
 function setPresets() {
     var home;
     
-    if (!options.useHome
-        || !options.homes
-        || (typeof options.homes) !== 'object'
-        || (typeof options.homes[0]) !== 'object'        
-        || (typeof options.home) !== 'string'        
-        || !options.home
-        || !(home = options.homes.find(function(home) { return (((typeof home) === 'object') && (home.name === options.home)); })))
+    if (options.useHomePresets
+        && options.homes
+        && (typeof options.homes) === 'object'
+        && (typeof options.homes[0]) === 'object'        
+        && options.home
+        && (typeof options.home) === 'string'        
+        && (home = options.homes.find(function(home) { return (((typeof home) === 'object') && (home.name === options.home)); })))
     {
+        console.log('Using hardcoded PRESETS');
+        myPresets = (home.presets || []);
+    }
+    else {
         console.log('Using env.PRESETS');
         try {
             myPresets = parseJSONArray(options.presets, "PRESETS");
@@ -85,17 +91,10 @@ function setPresets() {
             console.log('ERR', err);
         }
     }
-    else {
-        console.log('Using hardcoded PRESETS');
-        myRoomAliases = (home.presets || []);
-    }
     if (options.debug) {
         console.log(myPresets);
     }
 }
-
-setRoomAliases();
-setPresets();
 
 function findAlias(room, aliases) {
 	var res = room;
@@ -258,7 +257,12 @@ EchoSonos.prototype.intentHandlers = {
 
     PlayPresetIntent: function (intent, session, response) {
         console.log("PlayPresetIntent received");
+        var preset = slotValue(intent.slots.Preset).toLowerCase();
+        var room = checkRoomSlot(intent);
         options.path = '/preset/' + encodeURIComponent(slotValue(intent.slots.Preset).toLowerCase());
+        if (room) {
+            options.path += '/room/' + encodeURIComponent(room);
+        }
         httpreq(options, function(error) {
             genericResponse(error, response);
         });
@@ -539,10 +543,10 @@ function musicHandler(roomValue, service, cmdpath, name, response) {
 		    });
         }
         else {
-		    response.tell('I am too stupid to understand that');
+		    response.tell('I am too stupid to understand ' + (options.debug ? name : 'that'));
         }
 	} else if (p === 'undefined') {
-		response.tell('I am too stupid to understand that');
+		response.tell('I am too stupid to understand ' + (options.debug ? name : 'that'));
     }
     else {
 		var skillPath = '/musicsearch/' + service.toLowerCase() + cmdpath + encodeURIComponent(name);
@@ -1013,6 +1017,7 @@ exports.handler = function (event, context) {
         sqsServer = new AWS.SQS({region : region});
         sqsClient = new AWS.SQS({region : region});
     }
+    setRoomAliases();
+    setPresets();
     echoSonos.execute(event, context);
 };
-
