@@ -99,51 +99,50 @@ var defaultPresets = [
 				 'electronic',
 				 'jazz',
 				 'kera',
+				 'ocean sounds',
 				 'ocean surf',
 				 'ocean waves',
 				 'rock'
 ];
 
 var middleglenPresets = [
-    "ambient radio.json", "an african night.json", "archaic beat.json", "baroque radio.json", "blues acoustic.json", "blues electric.json",
-    "blues uk.json", "blues.json", "boot liquor.json", "chicago blues.json", "christmas radio.json", "classic rock.json", "classical 101.json",
-    "classical guitar.json", "crickets summer night.json", "electronic radio.json", "gangsta rap radio.json", "hearts of space.json", "jazz.json",
-    "kera.json", "middle eastern.json", "ocean surf.json", "ocean waves.json", "quiet classical.json", "reggae.json", "rock.json",
-    "roots reggae.json", "sahara sunset radio.json", "secret agent.json", "smooth jazz.json", "this weeks show.json", "thundering rainstorm.json",
-    "toad trills and thunder.json", "npr.json", "public radio.json", "pbs.json", "rock music.json", "kera radio.json", "npr radio.json",
-    "reggae music.json", "blues radio.json", "country.json", "shit kicker.json", "quiet jazz.json", "ancient beat.json", "ancient beats.json",
-    "archaic beats.json", "reggae radio.json", "music for spys.json", "spy music.json", "ambient.json", "baroque.json", "classical music.json",
-    "classical radio.json", "classical.json", "classic blues.json", "blues.json", "wrr.json", "ambient music.json", "baroque music.json",
-    "acoustic blues.json", "electric blues.json", "quiet music.json", "christmas.json", "christmas music.json", "africa.json", "african night.json",
-    "electronic.json", "electronic music.json", "gangster.json", "gangster radio.json", "gangsta radio.json", "gangsta.json", "lounge.json",
-    "sahara sunset.json", "rain.json", "thunder storm.json", "thunder.json", "thunderstorm.json", "summer crickets.json", "frogs.json",
-    "thunder toads.json", "thunder tongues.json", "toads.json", "thunder tones.json"
+    "ambient radio", "an african night", "archaic beat", "baroque radio", "blues acoustic", "blues electric",
+    "blues uk", "blues", "boot liquor", "chicago blues", "christmas radio", "classic rock", "classical 101",
+    "classical guitar", "crickets summer night", "electronic radio", "gangsta rap radio", "hearts of space", "jazz",
+    "kera", "middle eastern", "ocean sounds", "ocean surf", "ocean waves", "quiet classical", "reggae", "rock",
+    "roots reggae", "sahara sunset radio", "secret agent", "smooth jazz", "this weeks show", "thundering rainstorm",
+    "toad trills and thunder", "npr", "public radio", "pbs", "rock music", "kera radio", "npr radio",
+    "reggae music", "blues radio", "country", "shit kicker", "quiet jazz", "ancient beat", "ancient beats",
+    "archaic beats", "reggae radio", "music for spys", "spy music", "ambient", "baroque", "classical music",
+    "classical radio", "classical", "classic blues", "blues", "wrr", "ambient music", "baroque music",
+    "acoustic blues", "electric blues", "quiet music", "christmas", "christmas music", "africa", "african night",
+    "electronic", "electronic music", "gangster", "gangster radio", "gangsta radio", "gangsta", "lounge",
+    "sahara sunset", "rain", "thunder storm", "thunder", "thunderstorm", "summer crickets", "frogs",
+    "thunder toads", "thunder tongues", "toads", "thunder tones"
 ];
 
 /*
-["ambient radio.json","an african night.json","archaic beat.json","baroque radio.json","blues acoustic.json","blues electric.json","blues uk.json","blues.json","boot liquor.json","chicago blues.json","christmas radio.json","classic rock.json","classical 101.json","classical guitar.json","crickets summer night.json","electronic radio.json","gangsta rap radio.json","hearts of space.json","jazz.json","kera.json","middle eastern.json","ocean surf.json","ocean waves.json","quiet classical.json","reggae.json","rock.json","roots reggae.json","sahara sunset radio.json","secret agent.json","smooth jazz.json","this weeks show.json","thundering rainstorm.json","toad trills and thunder.json","npr.json","public radio.json","pbs.json","rock music.json","kera radio.json","npr radio.json","reggae music.json","blues radio.json","country.json","shit kicker.json","quiet jazz.json","ancient beat.json","ancient beats.json","archaic beats.json","reggae radio.json","music for spys.json","spy music.json","ambient.json","baroque.json","classical music.json","classical radio.json","classical.json","classic blues.json","blues.json","wrr.json","ambient music.json","baroque music.json","acoustic blues.json","electric blues.json","quiet music.json","christmas.json","christmas music.json","africa.json","african night.json","electronic.json","electronic music.json","gangster.json","gangster radio.json","gangsta radio.json","gangsta.json","lounge.json","sahara sunset.json","rain.json","thunder storm.json","thunder.json","thunderstorm.json","summer crickets.json","frogs.json","thunder toads.json","thunder tongues.json","toads.json","thunder tones.json"]
+var middleglenPresetsJSON = '["ambient radio", "an african night", "archaic beat", "baroque radio", "blues acoustic", "blues electric", "blues uk", "blues", "boot liquor", "chicago blues", "christmas radio", "classic rock", "classical 101", "classical guitar", "crickets summer night", "electronic radio", "gangsta rap radio", "hearts of space", "jazz", "kera", "middle eastern", "ocean sounds", "ocean surf", "ocean waves", "quiet classical", "reggae", "rock", "roots reggae", "sahara sunset radio", "secret agent", "smooth jazz", "this weeks show", "thundering rainstorm", "toad trills and thunder", "npr", "public radio", "pbs", "rock music", "kera radio", "npr radio", "reggae music", "blues radio", "country", "shit kicker", "quiet jazz", "ancient beat", "ancient beats", "archaic beats", "reggae radio", "music for spys", "spy music", "ambient", "baroque", "classical music", "classical radio", "classical", "classic blues", "blues", "wrr", "ambient music", "baroque music", "acoustic blues", "electric blues", "quiet music", "christmas", "christmas music", "africa", "african night", "electronic", "electronic music", "gangster", "gangster radio", "gangsta radio", "gangsta", "lounge", "sahara sunset", "rain", "thunder storm", "thunder", "thunderstorm", "summer crickets", "frogs", "thunder toads", "thunder tongues", "toads", "thunder tones" ]';
 */
 
-
 var lakehousePresets = [
-    "ambient radio.json", "an african night.json", "archaic beat.json", "baroque radio.json", "blues acoustic.json", "blues electric.json",
-    "blues uk.json", "blues.json", "boot liquor.json", "chicago blues.json", "christmas radio.json", "classic rock.json", "classical 101.json",
-    "classical guitar.json", "crickets summer night.json", "electronic radio.json", "gangsta rap radio.json", "hard rock", "hearts of space.json", "jazz.json",
-    "kera.json", "middle eastern.json", "ocean surf.json", "ocean waves.json", "quiet classical.json", "reggae.json", "rock.json",
-    "roots reggae.json", "sahara sunset radio.json", "secret agent.json", "smooth jazz.json", "this weeks show.json", "thundering rainstorm.json",
-    "toad trills and thunder.json", "npr.json", "public radio.json", "pbs.json", "rock music.json", "kera radio.json", "npr radio.json",
-    "reggae music.json", "blues radio.json", "country.json", "shit kicker.json", "quiet jazz.json", "ancient beat.json", "ancient beats.json",
-    "archaic beats.json", "reggae radio.json", "music for spys.json", "spy music.json", "ambient.json", "baroque.json", "classical music.json",
-    "classical radio.json", "classical.json", "classic blues.json", "blues.json", "wrr.json", "ambient music.json", "baroque music.json",
-    "acoustic blues.json", "electric blues.json", "quiet music.json", "christmas.json", "christmas music.json", "africa.json", "african night.json",
-    "electronic.json", "electronic music.json", "gangster.json", "gangster radio.json", "gangsta radio.json", "gangsta.json", "lounge.json",
-    "sahara sunset.json", "rain.json", "thunder storm.json", "thunder.json", "thunderstorm.json", "summer crickets.json", "frogs.json",
-    "thunder toads.json", "thunder tongues.json", "toads.json", "thunder tones.json"
+    "ambient radio", "an african night", "archaic beat", "baroque radio", "blues acoustic", "blues electric",
+    "blues uk", "blues", "boot liquor", "chicago blues", "christmas radio", "classic rock", "classical 101",
+    "classical guitar", "crickets summer night", "electronic radio", "gangsta rap radio", "hard rock", "hearts of space", "jazz",
+    "kera", "middle eastern", "ocean surf", "ocean waves", "quiet classical", "reggae", "rock",
+    "roots reggae", "sahara sunset radio", "secret agent", "smooth jazz", "this weeks show", "thundering rainstorm",
+    "toad trills and thunder", "npr", "public radio", "pbs", "rock music", "kera radio", "npr radio",
+    "reggae music", "blues radio", "country", "shit kicker", "quiet jazz", "ancient beat", "ancient beats",
+    "archaic beats", "reggae radio", "music for spys", "spy music", "ambient", "baroque", "classical music",
+    "classical radio", "classical", "classic blues", "blues", "wrr", "ambient music", "baroque music",
+    "acoustic blues", "electric blues", "quiet music", "christmas", "christmas music", "africa", "african night",
+    "electronic", "electronic music", "gangster", "gangster radio", "gangsta radio", "gangsta", "lounge",
+    "sahara sunset", "rain", "thunder storm", "thunder", "thunderstorm", "summer crickets", "frogs",
+    "thunder toads", "thunder tongues", "toads", "thunder tones"
 ];
 
-
 /*
-["ambient radio.json","an african night.json","archaic beat.json","baroque radio.json","blues acoustic.json","blues electric.json","blues uk.json","blues.json","boot liquor.json","chicago blues.json","christmas radio.json","classic rock.json","classical 101.json","classical guitar.json","crickets summer night.json","electronic radio.json","gangsta rap radio.json","hard rock","hearts of space.json","jazz.json","kera.json","middle eastern.json","ocean surf.json","ocean waves.json","quiet classical.json","reggae.json","rock.json","roots reggae.json","sahara sunset radio.json","secret agent.json","smooth jazz.json","this weeks show.json","thundering rainstorm.json","toad trills and thunder.json","npr.json","public radio.json","pbs.json","rock music.json","kera radio.json","npr radio.json","reggae music.json","blues radio.json","country.json","shit kicker.json","quiet jazz.json","ancient beat.json","ancient beats.json","archaic beats.json","reggae radio.json","music for spys.json","spy music.json","ambient.json","baroque.json","classical music.json","classical radio.json","classical.json","classic blues.json","blues.json","wrr.json","ambient music.json","baroque music.json","acoustic blues.json","electric blues.json","quiet music.json","christmas.json","christmas music.json","africa.json","african night.json","electronic.json","electronic music.json","gangster.json","gangster radio.json","gangsta radio.json","gangsta.json","lounge.json","sahara sunset.json","rain.json","thunder storm.json","thunder.json","thunderstorm.json","summer crickets.json","frogs.json","thunder toads.json","thunder tongues.json","toads.json","thunder tones.json"]
+var lakehousePresetsJSON = '["ambient radio", "an african night", "archaic beat", "baroque radio", "blues acoustic", "blues electric", "blues uk", "blues", "boot liquor", "chicago blues", "christmas radio", "classic rock", "classical 101", "classical guitar", "crickets summer night", "electronic radio", "gangsta rap radio", "hearts of space", "jazz", "kera", "middle eastern", "ocean surf", "ocean waves", "quiet classical", "reggae", "rock", "roots reggae", "sahara sunset radio", "secret agent", "smooth jazz", "this weeks show", "thundering rainstorm", "toad trills and thunder", "npr", "public radio", "pbs", "rock music", "kera radio", "npr radio", "reggae music", "blues radio", "country", "shit kicker", "quiet jazz", "ancient beat", "ancient beats", "archaic beats", "reggae radio", "music for spys", "spy music", "ambient", "baroque", "classical music", "classical radio", "classical", "classic blues", "blues", "wrr", "ambient music", "baroque music", "acoustic blues", "electric blues", "quiet music", "christmas", "christmas music", "africa", "african night", "electronic", "electronic music", "gangster", "gangster radio", "gangsta radio", "gangsta", "lounge", "sahara sunset", "rain", "thunder storm", "thunder", "thunderstorm", "summer crickets", "frogs", "thunder toads", "thunder tongues", "toads", "thunder tones" ]';
 */
 
 var myHomes = [
