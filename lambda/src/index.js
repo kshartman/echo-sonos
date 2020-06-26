@@ -108,7 +108,7 @@ function findAlias(name, aliases) {
     try {
         for (var i = 0; i < aliases.length; i++) {
             for (var j = 0; j < aliases[i].alias.length; j++) {
-                if (aliases[i].alias[j] == name) {
+                if (aliases[i].alias[j] === name) {
                     res = aliases[i].name;
                     throw res;
                 }
@@ -173,11 +173,12 @@ function slotValue(slot, useId) {
     return value;
 }
 
-function checkRoomSlot(intent) {
+function checkRoomSlot(intent, slotName) {
+    if (!slotName) slotName = 'Room';
     try {
         // store room aliases in model aliases.  store actual speaker id.  use the id here
         // so, for example, spoken value: "office" => id: "office_speakers" (case sensitive, of course)
-        return slotValue(intent.slots.Room, true);
+        return slotValue(intent.slots[slotName], true);
     }
     catch (err) {
         return '';
@@ -516,8 +517,8 @@ EchoSonos.prototype.intentHandlers = {
 
     JoinGroupIntent: function (intent, session, response) {
         console.log("JoinGroupIntent received");
-        options.path = '/' + encodeURIComponent(slotValue(intent.slots.JoiningRoom)) + '/join/' +
-            encodeURIComponent(slotValue(intent.slots.PlayingRoom));
+        options.path = '/' + encodeURIComponent(checkRoomSlot(intent, 'JoiningRoom')) + '/join/' +
+            encodeURIComponent(checkRoomSlot(intent, 'PlayingRoom'));
         httpreq(options, function (error) {
             genericResponse(error, response);
         });

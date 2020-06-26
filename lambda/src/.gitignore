@@ -1,0 +1,7 @@
+.DS_Store
+options.js
+settings.json
+*.zip
+zip/
+*~
+*#
